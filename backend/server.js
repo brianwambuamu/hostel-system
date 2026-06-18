@@ -1,25 +1,24 @@
 // backend/server.js
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-// ... your other imports (mongoose, redis, etc.)
+const { connectDB } = require('./config/db');
+require('./workers/releaseWorker'); // Initialize cron jobs
 
-dotenv.config();
 const app = express();
 
-// Middlewares
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ─── AUTHENTICATION ROUTE MOUNTING ─────────────────────────────────
-// This links http://localhost:5000/api/auth/* to your auth routes file
-app.use('/api/auth', require('./routes/authRoutes'));
-// ───────────────────────────────────────────────────────────────────
-
-// Your other routes
+// Routes
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/transfers', require('./routes/transferRoutes'));
-app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes')); // Fixed targeting folder reference
+// DB Connection
+connectDB();
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 System running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 System running on port ${PORT}`);
+});
